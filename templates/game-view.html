@@ -16,12 +16,19 @@
     </div>
 </div>
 
-<a href="javascript:balanceTables();">Balance Tables</a>
+<div class="pokertable-seating-options">
+    <label for="collapse-table-option">
+    <input class="checkbox" type="checkbox" id="collapse-table-option" />
+    Collapse tables if possible</label>
+    <a href="javascript:balanceTables();">Balance Tables</a>
+    <a href="javascript:reseatPlayers();">Reseat Players</a>
+</div>
+
 <div id="player-lists">
     <div id="in-game-players" class="players-in-game">
 
 
-        <div class="table-label-header">Active Players</div>
+        <div class="table-label-header">Active Players ({{ gamePlayerList|length }})</div>
         <div id="active-players">
             <div id="active-table-1" class="table-bordered">
                 <div class="row">
@@ -44,7 +51,7 @@
                 {% endfor %}
             </div>
         </div>
-        <div class="table-label-header">Eliminated Players</div>
+        <div class="table-label-header">Eliminated Players ({{ finishedPlayers|length }})</div>
         <div id="eliminated-players">
             <div id="eliminated-players-table" class="table-bordered">
                 <div class="row">
@@ -68,14 +75,15 @@
     </div>
     {% if interestList|length > 0 %}
     <div id="playerlist-interested" class="player-interested">
-        <div class="table-label-header">Interested Players</div>
+        <div class="table-label-header">Interested Players ({{ interestList|length }})</div>
         <div id="player-feed" class="table-bordered">
         <div id="interested-players">
             <div id="interested-players-table" class="table">
                 {% for player in interestList %}
                     <div class="row">
-                        <div class="cell twocol">{{ player.nickname }}</div>
-                        <div class="cell twocol"><a href="javascript:seatPlayer({{ player.id }});">Seat Player</a></div>
+                        <div class="cell threecol">{{ forloop.counter }}</div>
+                        <div class="cell threecol">{{ player.nickname }}</div>
+                        <div class="cell threecol"><a href="javascript:seatPlayer({{ player.id }});">Seat Player</a></div>
                     </div>
                 {% endfor %}
             </div>
@@ -101,6 +109,16 @@
         </div>
     </div>
 </div>
+
+<div id="new-player-entry">
+    <form name="signup" id="create-and-signup" action="{{ appLocation }}game/{{ game.id }}/signup-newplayer" method="POST">
+        {% csrf_token %}
+        <input type="text" id="create-and-signup-nickname" name="nickname"
+               value="New User"/>
+        <input type="submit" value="Signup New Player"/>
+    </form>
+</div>
+
 <form id="seat-player" action="seat-player" method="POST">
     {% csrf_token %}
     <input type="hidden" id="seat-player-playerId" name="playerId" value="-1"/>
@@ -122,10 +140,16 @@
 </form>
 
 <form id="balance-tables" action="balance-tables" method="POST">
+    <input type="hidden" id="balance-collapseTables" name="collapseTables" value="false" />
     {% csrf_token %}
 </form>
 
 <form id="player-interested" action="player-interested" method="POST">
     {% csrf_token %}
     <input type="hidden" id="interested-player-playerId" name="playerId" value="-1"/>
+</form>
+
+<form id="reseat-players" action="reseat-players" method="POST">
+    <input type="hidden" id="reseat-collapseTables" name="collapseTables" value="false" />
+    {% csrf_token %}
 </form>
